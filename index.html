@@ -23,24 +23,37 @@
     const db = getDatabase(app);
     const chatRef = ref(db, 'chats');
 
+    function shakeInput(input) {
+      input.classList.add('shake');
+      setTimeout(() => input.classList.remove('shake'), 500);
+    }
+
     window.sendMessage = () => {
+      const nameInput = document.getElementById('nameInput');
       const input = document.getElementById('chatInput');
-      if (input.value.trim() !== '') {
+      if (input.value.trim() !== '' && nameInput.value.trim() !== '') {
         const msgRef = push(chatRef, {
-          text: input.value,
+          text: `${nameInput.value}: ${input.value}`,
           timestamp: Date.now()
         });
         input.value = '';
         setTimeout(() => remove(msgRef), 10000);
+      } else if (nameInput.value.trim() === '') {
+        shakeInput(nameInput);
       }
     };
 
     window.sendEmoji = (emoji) => {
-      const msgRef = push(chatRef, {
-        text: emoji,
-        timestamp: Date.now()
-      });
-      setTimeout(() => remove(msgRef), 10000);
+      const nameInput = document.getElementById('nameInput');
+      if (nameInput.value.trim() !== '') {
+        const msgRef = push(chatRef, {
+          text: `${nameInput.value}: ${emoji}`,
+          timestamp: Date.now()
+        });
+        setTimeout(() => remove(msgRef), 10000);
+      } else {
+        shakeInput(nameInput);
+      }
     };
 
     onChildAdded(chatRef, (data) => {
@@ -55,7 +68,7 @@
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
       bubble.style.left = Math.random() * 80 + 10 + '%';
-      bubble.style.top = '80%';
+      bubble.style.top = '90%';
       bubble.innerText = text;
       document.body.appendChild(bubble);
       setTimeout(() => bubble.remove(), 4000);
@@ -148,13 +161,23 @@
       align-items: center;
       gap: 10px;
     }
-    .chat-input {
+    .chat-input, .name-input {
       padding: 10px;
       border-radius: 10px;
       border: none;
       width: 250px;
       font-size: 1rem;
       font-family: 'Ramelik';
+    }
+    .shake {
+      animation: shake 0.5s;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
     .emoji-buttons button {
       margin: 0 5px;
@@ -235,6 +258,7 @@
     <button onclick="document.getElementById('chatBox').style.display = document.getElementById('chatBox').style.display === 'flex' ? 'none' : 'flex';">Toggle Interaksi</button>
   </div>
   <div class="chat-box" id="chatBox">
+    <input type="text" class="name-input" id="nameInput" placeholder="Nama kamu..." />
     <input type="text" class="chat-input" id="chatInput" placeholder="Ketik pesanmu..." />
     <button onclick="sendMessage()">Kirim</button>
     <div class="emoji-buttons">
