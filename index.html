@@ -6,7 +6,7 @@
   <title>Countdown BAZKOM MONSTAZIA</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, remove, onDisconnect, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyATXli6tY9Bp2E4O_ubjM5fs2gRjcKq-YU",
@@ -22,8 +22,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const chatRef = ref(db, 'chats');
-    const presenceRef = ref(db, 'presence');
-    const haloRef = ref(db, 'halo');
 
     function shakeInput(input) {
       input.classList.add('shake');
@@ -58,6 +56,14 @@
       }
     };
 
+    onChildAdded(chatRef, (data) => {
+      const val = data.val();
+      const age = Date.now() - val.timestamp;
+      if (age < 15000) {
+        createBubble(val.text);
+      }
+    });
+
     function createBubble(text) {
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
@@ -68,64 +74,16 @@
       setTimeout(() => bubble.remove(), 4000);
     }
 
-    function createHalo(text) {
-      const notif = document.createElement('div');
-      notif.className = 'bubble';
-      notif.style.left = '50%';
-      notif.style.top = '80%';
-      notif.style.transform = 'translateX(-50%)';
-      notif.innerText = text;
-      document.body.appendChild(notif);
-      setTimeout(() => notif.remove(), 4000);
-    }
-
-    window.sayHello = (targetName) => {
-      const nameInput = document.getElementById('nameInput');
-      if (nameInput.value.trim() !== '') {
-        push(haloRef, {
-          from: nameInput.value.trim(),
-          to: targetName,
-          timestamp: Date.now()
-        });
+    window.toggleMusic = () => {
+      const audio = document.getElementById('bg-music');
+      const btn = document.getElementById('musicToggle');
+      if (audio.paused) {
+        audio.play();
+        btn.innerText = '🔊';
       } else {
-        shakeInput(nameInput);
+        audio.pause();
+        btn.innerText = '🔇';
       }
-    }
-
-    onChildAdded(chatRef, (data) => {
-      const val = data.val();
-      const age = Date.now() - val.timestamp;
-      if (age < 15000) {
-        createBubble(val.text);
-      }
-    });
-
-    onChildAdded(haloRef, (data) => {
-      const val = data.val();
-      const nameInput = document.getElementById('nameInput');
-      if (val.to === nameInput.value.trim()) {
-        createHalo(`👋 Halo dari ${val.from}`);
-      }
-    });
-
-    onValue(presenceRef, (snapshot) => {
-      const list = document.getElementById('userList');
-      list.innerHTML = '';
-      const val = snapshot.val();
-      for (const key in val) {
-        const item = document.createElement('div');
-        item.className = 'user-item';
-        item.innerHTML = `${val[key]} <button onclick="sayHello('${val[key]}')">👋</button>`;
-        list.appendChild(item);
-      }
-    });
-
-    window.trackPresence = () => {
-      const nameInput = document.getElementById('nameInput');
-      const userId = Math.random().toString(36).substring(2);
-      const userRef = ref(db, `presence/${userId}`);
-      set(userRef, nameInput.value.trim());
-      onDisconnect(userRef).remove();
     }
   </script>
   <style>
@@ -139,37 +97,8 @@
       font-family: 'Ramelik', sans-serif;
       color: #fff;
       text-align: center;
-      padding: 20px 20px 20px 220px;
+      padding: 20px;
       overflow-x: hidden;
-    }
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 200px;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 10px;
-      overflow-y: auto;
-      color: #fff;
-      font-family: 'Ramelik';
-      font-size: 0.9rem;
-      z-index: 1000;
-    }
-    .user-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 5px 0;
-      padding: 5px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 5px;
-    }
-    .user-item button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.1rem;
     }
     .logo {
       max-width: 320px;
@@ -213,10 +142,25 @@
       backdrop-filter: blur(10px);
       animation: pulse 2s infinite ease-in-out, wiggle 6s infinite ease-in-out;
     }
-    .time { font-size: 3.5rem; color: #00ffe0; }
-    .label { font-size: 1.2rem; margin-top: 12px; color: #ff00cc; letter-spacing: 1px; }
-    .chat-toggle { margin: 40px 0 10px; }
-    .chat-box { display: none; flex-direction: column; align-items: center; gap: 10px; }
+    .time {
+      font-size: 3.5rem;
+      color: #00ffe0;
+    }
+    .label {
+      font-size: 1.2rem;
+      margin-top: 12px;
+      color: #ff00cc;
+      letter-spacing: 1px;
+    }
+    .chat-toggle {
+      margin: 40px 0 10px;
+    }
+    .chat-box {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
     .chat-input, .name-input {
       padding: 10px;
       border-radius: 10px;
@@ -225,7 +169,9 @@
       font-size: 1rem;
       font-family: 'Ramelik';
     }
-    .shake { animation: shake 0.5s; }
+    .shake {
+      animation: shake 0.5s;
+    }
     @keyframes shake {
       0% { transform: translateX(0); }
       25% { transform: translateX(-5px); }
@@ -269,8 +215,13 @@
       font-size: 0.9rem;
       color: #ccc;
     }
-    footer a { color: #ff00cc; text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+    footer a {
+      color: #ff00cc;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
     @keyframes floatUp {
       0% { transform: translateY(0); opacity: 1; }
       100% { transform: translateY(-200px); opacity: 0; }
@@ -292,11 +243,6 @@
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <strong>👥 Pengunjung Online:</strong>
-    <div id="userList"></div>
-  </div>
-
   <img src="monstazia-logo.png" alt="Logo Monstazia" class="logo" />
   <div class="tagline">Menanti Asa Zona Harmonia</div>
   <div class="countdown-container">
@@ -346,10 +292,6 @@
     }
     updateCountdown();
     setInterval(updateCountdown, 1000);
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('nameInput').addEventListener('change', trackPresence);
-    });
   </script>
 </body>
 </html>
