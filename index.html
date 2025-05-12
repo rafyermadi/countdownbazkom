@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Countdown BAZKOM MONSTAZIA</title>
+  <style>
+    @font-face {
+      font-family: 'Ramelik';
+      src: url('Ramelik.otf') format('opentype');
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #1e0036, #3b004f);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Ramelik', sans-serif;
+      color: #ffffff;
+    }
+
+    .logo {
+      max-width: 300px;
+      margin-bottom: 40px;
+      filter: drop-shadow(0 0 10px #ff00cc88);
+    }
+
+    .countdown-container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px #ff00cc88, 0 0 50px #00ffe088;
+    }
+
+    .countdown-title {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #ff00cc;
+      text-shadow: 0 0 10px #ff00cc, 0 0 20px #00ffe0;
+    }
+
+    .countdown {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .time-box {
+      background: rgba(0, 255, 224, 0.1);
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00ffe0aa;
+      backdrop-filter: blur(10px);
+      min-width: 100px;
+    }
+
+    .time {
+      font-size: 3rem;
+      color: #00ffe0;
+    }
+
+    .label {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #ff00cc;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <img src="monstazia-logo.png" alt="Logo Monstazia" class="logo" />
+
+  <div class="countdown-container">
+    <div class="countdown-title">BAZKOM MONSTAZIA STARTS IN</div>
+    <div class="countdown" id="countdown">
+      <div class="time-box">
+        <div class="time" id="days">00</div>
+        <div class="label">DAYS</div>
+      </div>
+      <div class="time-box">
+        <div class="time" id="hours">00</div>
+        <div class="label">HOURS</div>
+      </div>
+      <div class="time-box">
+        <div class="time" id="minutes">00</div>
+        <div class="label">MINUTES</div>
+      </div>
+      <div class="time-box">
+        <div class="time" id="seconds">00</div>
+        <div class="label">SECONDS</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const targetDate = new Date("2025-07-18T00:00:00").getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = days.toString().padStart(2, '0');
+      document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+      document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+      document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
