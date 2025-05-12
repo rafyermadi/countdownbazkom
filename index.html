@@ -6,7 +6,7 @@
   <title>Countdown BAZKOM MONSTAZIA</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyATXli6tY9Bp2E4O_ubjM5fs2gRjcKq-YU",
@@ -26,18 +26,29 @@
     window.sendMessage = () => {
       const input = document.getElementById('chatInput');
       if (input.value.trim() !== '') {
-        push(chatRef, { text: input.value });
+        const msgRef = push(chatRef, {
+          text: input.value,
+          timestamp: Date.now()
+        });
         input.value = '';
+        setTimeout(() => remove(msgRef), 10000); // Auto remove after 10s
       }
     };
 
     window.sendEmoji = (emoji) => {
-      push(chatRef, { text: emoji });
+      const msgRef = push(chatRef, {
+        text: emoji,
+        timestamp: Date.now()
+      });
+      setTimeout(() => remove(msgRef), 10000); // Auto remove after 10s
     };
 
     onChildAdded(chatRef, (data) => {
       const val = data.val();
-      createBubble(val.text);
+      const age = Date.now() - val.timestamp;
+      if (age < 15000) {
+        createBubble(val.text);
+      }
     });
 
     function createBubble(text) {
@@ -118,7 +129,6 @@
       <div class="time-box"><div class="time" id="seconds">00</div><div class="label">SECONDS</div></div>
     </div>
   </div>
-
   <div class="chat-toggle">
     <button onclick="document.getElementById('chatBox').style.display = document.getElementById('chatBox').style.display === 'flex' ? 'none' : 'flex';">Toggle Interaksi</button>
   </div>
@@ -132,7 +142,6 @@
       <button onclick="sendEmoji('😂')">😂</button>
     </div>
   </div>
-
   <script>
     const targetDate = new Date("2025-07-18T00:00:00").getTime();
     function updateCountdown() {
