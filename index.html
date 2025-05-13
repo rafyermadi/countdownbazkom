@@ -4,31 +4,89 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Countdown BAZKOM MONSTAZIA</title>
-  <script type="module" src="main.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyATXli6tY9Bp2E4O_ubjM5fs2gRjcKq-YU",
+      authDomain: "bazkom-monstazia.firebaseapp.com",
+      databaseURL: "https://bazkom-monstazia-default-rtdb.firebaseio.com",
+      projectId: "bazkom-monstazia",
+      storageBucket: "bazkom-monstazia.firebasestorage.app",
+      messagingSenderId: "196692749919",
+      appId: "1:196692749919:web:4a78e58df20222fc2b35ea",
+      measurementId: "G-G1Q18MK7GK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const chatRef = ref(db, 'chats');
+
+    function shakeInput(input) {
+      input.classList.add('shake');
+      setTimeout(() => input.classList.remove('shake'), 500);
+    }
+
+    window.sendMessage = () => {
+      const nameInput = document.getElementById('nameInput');
+      const input = document.getElementById('chatInput');
+      if (input.value.trim() !== '' && nameInput.value.trim() !== '') {
+        const msgRef = push(chatRef, {
+          text: `${nameInput.value}: ${input.value}`,
+          timestamp: Date.now()
+        });
+        input.value = '';
+        setTimeout(() => remove(msgRef), 10000);
+      } else if (nameInput.value.trim() === '') {
+        shakeInput(nameInput);
+      }
+    };
+
+    window.sendEmoji = (emoji) => {
+      const nameInput = document.getElementById('nameInput');
+      if (nameInput.value.trim() !== '') {
+        const msgRef = push(chatRef, {
+          text: `${nameInput.value}: ${emoji}`,
+          timestamp: Date.now()
+        });
+        setTimeout(() => remove(msgRef), 10000);
+      } else {
+        shakeInput(nameInput);
+      }
+    };
+
+    onChildAdded(chatRef, (data) => {
+      const val = data.val();
+      const age = Date.now() - val.timestamp;
+      if (age < 15000) {
+        createBubble(val.text);
+      }
+    });
+
+    function createBubble(text) {
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.style.left = Math.random() * 80 + 10 + '%';
+      bubble.style.top = '90%';
+      bubble.innerText = text;
+      document.body.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 4000);
+    }
+
+    window.toggleMusic = () => {
+      const audio = document.getElementById('bg-music');
+      const btn = document.getElementById('musicToggle');
+      if (audio.paused) {
+        audio.play();
+        btn.innerText = '🔊';
+      } else {
+        audio.pause();
+        btn.innerText = '🔇';
+      }
+    }
+  </script>
   <style>
-    #userListContainer {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(8px);
-      padding: 10px 15px;
-      border-radius: 10px;
-      color: white;
-      font-size: 0.9rem;
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 1000;
-    }
-    #userList li {
-      list-style: none;
-      margin: 5px 0;
-      cursor: pointer;
-    }
-    #userList li:hover {
-      text-decoration: underline;
-      color: #00ffe0;
-    }
     @font-face {
       font-family: 'Ramelik';
       src: url('Ramelik.otf') format('opentype');
@@ -185,11 +243,6 @@
   </style>
 </head>
 <body>
-  <div id="userListContainer">
-    <strong>👥 Pengunjung Aktif</strong>
-    <ul id="userList"></ul>
-  </div>
-
   <img src="monstazia-logo.png" alt="Logo Monstazia" class="logo" />
   <div class="tagline">Menanti Asa Zona Harmonia</div>
   <div class="countdown-container">
