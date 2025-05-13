@@ -56,18 +56,22 @@
       }
     }
 
-    onValue(userRef, (snapshot) => {
-      const list = document.getElementById('userList');
-      list.innerHTML = '';
-      snapshot.forEach(child => {
-        const name = child.key;
-        if (name !== localStorage.getItem('visitorName')) {
-          const item = document.createElement('li');
-          item.textContent = name;
-          item.onclick = () => sayHiTo(name);
-          list.appendChild(item);
-        }
-      });
+    window.addEventListener("DOMContentLoaded", () => {
+  onValue(userRef, (snapshot) => {
+    const list = document.getElementById('userList');
+    if (!list) return;
+    list.innerHTML = '';
+    snapshot.forEach(child => {
+      const name = child.key;
+      if (name !== localStorage.getItem('visitorName')) {
+        const item = document.createElement('li');
+        item.textContent = name;
+        item.onclick = () => sayHiTo(name);
+        list.appendChild(item);
+      }
+    });
+  });
+});
     });
 
     onChildAdded(chatRef, (data) => {
