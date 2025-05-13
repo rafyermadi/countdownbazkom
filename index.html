@@ -317,5 +317,47 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
   </script>
+
+<!-- Efek glow berdenyut sesuai musik -->
+  <script>
+    const audioElement = document.getElementById('bg-music');
+    const logo = document.querySelector('.logo');
+    const countdownContainer = document.querySelector('.countdown-container');
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaElementSource(audioElement);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+    
+    function animateGlow() {
+      analyser.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+      const intensity = average / 255;
+
+      const glowSize = 20 + intensity * 80;
+
+      // Efek ke logo
+      logo.style.filter = `drop-shadow(0 0 ${glowSize}px #ff00cc)`;
+
+      // Efek ke box countdown
+      countdownContainer.style.boxShadow = `
+        0 0 ${glowSize}px #ff00cc88,
+        0 0 ${glowSize * 1.2}px #00ffe088
+      `;
+
+      requestAnimationFrame(animateGlow);
+    }
+
+    // Mulai efek saat musik dimainkan
+    audioElement.addEventListener('play', () => {
+      audioContext.resume().then(() => {
+        animateGlow();
+      });
+    });
+  </script>
 </body>
 </html>
