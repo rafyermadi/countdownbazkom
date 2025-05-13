@@ -269,9 +269,19 @@
       top: -10%;
       left: -10%;
     }
+    #star-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0; /* Pastikan di belakang elemen lain */
+    }
   </style>
 </head>
 <body>
+  <canvas id="star-canvas"></canvas>
   <div class="logo-container">
     <img src="monstazia-logo.png" alt="Logo Monstazia" class="logo" />
   </div>
@@ -366,5 +376,80 @@
       });
     });
   </script>
+  <script>
+    const canvas = document.getElementById('star-canvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let audioCtx, analyser, source, dataArray;
+    let isMusicPlaying = false;
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+  for (let i = 0; i < 150; i++) {
+    stars.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      radius: Math.random() * 1.5 + 0.5,
+      speed: Math.random() * 0.5 + 0.2,
+      twinkle: Math.random() * 0.05
+    });
+  }
+
+  function animateStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach((star, i) => {
+      let intensity = 1;
+
+      if (isMusicPlaying && analyser) {
+        analyser.getByteFrequencyData(dataArray);
+        const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        intensity = avg / 256;
+      } else {
+        intensity = 0.3; // smooth pulse
+      }
+
+      star.y += isMusicPlaying ? star.speed * intensity * 2 : star.speed * 0.2;
+      if (star.y > canvas.height) star.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.2 + Math.random() * 0.3 * intensity})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(animateStars);
+  }
+  animateStars();
+
+  // Hook to audio element
+    const bgMusic = document.getElementById('bg-music');
+    function setupAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        source = audioCtx.createMediaElementSource(bgMusic);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+      }
+    }
+    
+    bgMusic.addEventListener('play', () => {
+      setupAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      isMusicPlaying = true;
+  });
+    
+    bgMusic.addEventListener('pause', () => {
+    isMusicPlaying = false;
+  });
+  </script>
+
 </body>
 </html>
