@@ -278,6 +278,26 @@
       pointer-events: none;
       z-index: 0; /* Pastikan di belakang elemen lain */
     }
+    /* === Bintang yang mengikuti irama musik === */
+    .star-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+    }
+    .star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.3;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+    }
   </style>
 </head>
 <body>
@@ -389,29 +409,29 @@
     }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-
-  for (let i = 0; i < 150; i++) {
-    stars.push({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      radius: Math.random() * 1.5 + 0.5,
-      speed: Math.random() * 0.5 + 0.2,
-      twinkle: Math.random() * 0.05
-    });
-  }
-
-  function animateStars() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    stars.forEach((star, i) => {
-      let intensity = 1;
-
-      if (isMusicPlaying && analyser) {
-        analyser.getByteFrequencyData(dataArray);
-        const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
-        intensity = avg / 256;
-      } else {
-        intensity = 0.3; // smooth pulse
-      }
+    
+    for (let i = 0; i < 150; i++) {
+      stars.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        radius: Math.random() * 1.5 + 0.5,
+        speed: Math.random() * 0.5 + 0.2,
+        twinkle: Math.random() * 0.05
+      });
+    }
+    
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach((star, i) => {
+        let intensity = 1;
+        
+        if (isMusicPlaying && analyser) {
+          analyser.getByteFrequencyData(dataArray);
+          const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
+          intensity = avg / 256;
+        } else {
+          intensity = 0.3; // smooth pulse
+        }
 
       star.y += isMusicPlaying ? star.speed * intensity * 2 : star.speed * 0.2;
       if (star.y > canvas.height) star.y = 0;
@@ -444,11 +464,44 @@
       setupAudio();
       if (audioCtx.state === 'suspended') audioCtx.resume();
       isMusicPlaying = true;
-  });
+    });
     
     bgMusic.addEventListener('pause', () => {
     isMusicPlaying = false;
-  });
+    });// Tambahkan di sini, setelah event pause
+    function animateStarsWithMusic() {
+      requestAnimationFrame(animateStarsWithMusic);
+      
+      if (!analyser || !isMusicPlaying) return;
+      
+      const stars = document.querySelectorAll('.star');
+      const dataArrayLocal = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(dataArrayLocal);
+      
+      const avg = dataArrayLocal.reduce((a, b) => a + b) / dataArrayLocal.length;
+      const scale = 1 + avg / 256;
+      
+      stars.forEach(star => {
+        star.style.transform = `scale(${scale})`;
+        star.style.opacity = Math.min(1, 0.3 + avg / 512);
+      });
+    }
+    
+    // Jalankan loop animasi
+    animateStarsWithMusic();
+    
+    // Tambahkan bintang ke halaman
+    const starContainer = document.createElement('div');
+    starContainer.classList.add('star-container');
+    document.body.appendChild(starContainer);
+    
+    for (let i = 0; i < 100; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      starContainer.appendChild(star);
+    }
   </script>
 
 </body>
