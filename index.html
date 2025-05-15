@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Countdown BAZKOM MONSTAZIA 2025" />
+  <meta property="og:description" content="Siap menyambut zona harmonia? Saksikan hitung mundur menuju BAZKOM MONSTAZIA 2025!" />
+  <meta property="og:image" content="https://rafyermadi.github.io/countdownbazkom/preview.jpg" />
+  <meta property="og:url" content="https://rafyermadi.github.io/countdownbazkom/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Countdown BAZKOM MONSTAZIA</title>
@@ -109,9 +117,11 @@
     .tagline {
       font-size: 1.6rem;
       margin-bottom: 35px;
-      color: #ccccff;
       font-style: italic;
-      text-shadow: 0 0 5px #ff00ccaa;
+      background: linear-gradient(to right, #ffaadd, #d0cfff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 6px #ffccff;
     }
     .countdown-container {
       background: rgba(255, 255, 255, 0.05);
@@ -125,8 +135,10 @@
     .countdown-title {
       font-size: 2.8rem;
       margin-bottom: 35px;
-      color: #ff00cc;
-      text-shadow: 0 0 10px #ff00cc, 0 0 20px #00ffe0;
+      background: linear-gradient(to right, #ff6ec4, #7873f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 10px #ff6ec4, 0 0 20px #7873f5;
     }
     .countdown {
       display: grid;
@@ -240,10 +252,31 @@
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
+    
+    .logo-container {
+      position: relative;
+      display: inline-block;
+      z-index: 1;
+    }
+    
+    .logo-container::before {
+      content: '';
+      position: absolute;
+      width: 340px;
+      height: 340px;
+      background: radial-gradient(circle, #ff00cc88 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+      top: -10%;
+      left: -10%;
+    }
   </style>
+
 </head>
 <body>
-  <img src="monstazia-logo.png" alt="Logo Monstazia" class="logo" />
+  <div class="logo-container">
+    <img src="monstazia-logo.png" alt="Logo Monstazia" class="logo" />
+  </div>
   <div class="tagline">Menanti Asa Zona Harmonia</div>
   <div class="countdown-container">
     <div class="countdown-title">BAZKOM MONSTAZIA STARTS IN</div>
@@ -269,13 +302,15 @@
     </div>
   </div>
 
+  <!-- ...semua isi HTML kamu tetap seperti semula... -->
+  
   <audio id="bg-music" src="monstazia-theme.mp3" autoplay loop></audio>
   <button id="musicToggle" onclick="toggleMusic()">🔊</button>
-
+  
   <footer>
     Made with ❤️ by <a href="https://www.instagram.com/rafy.rayyan/" target="_blank">Rafy Rayyan</a>
   </footer>
-
+  
   <script>
     const targetDate = new Date("2025-07-18T00:00:00").getTime();
     function updateCountdown() {
@@ -292,6 +327,48 @@
     }
     updateCountdown();
     setInterval(updateCountdown, 1000);
+  </script>
+
+  <!-- Efek glow berdenyut sesuai musik -->
+  <script>
+    const audioElement = document.getElementById('bg-music');
+    const logo = document.querySelector('.logo');
+    const countdownContainer = document.querySelector('.countdown-container');
+    
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaElementSource(audioElement);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+    
+    function animateGlow() {
+      analyser.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+      const intensity = average / 255;
+      
+      const glowSize = 20 + intensity * 80;
+
+      // Efek ke logo
+      logo.style.filter = `drop-shadow(0 0 ${glowSize}px #ff00cc)`;
+
+      // Efek ke box countdown
+      countdownContainer.style.boxShadow = `
+      0 0 ${glowSize}px #ff00cc88,
+      0 0 ${glowSize * 1.2}px #00ffe088
+      `;
+      
+      requestAnimationFrame(animateGlow);
+    }
+
+    // Mulai efek saat musik dimainkan
+    audioElement.addEventListener('play', () => {
+      audioContext.resume().then(() => {
+        animateGlow();
+      });
+    });
   </script>
 </body>
 </html>
