@@ -3,13 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="Countdown BAZKOM MONSTAZIA 2025" />
-  <meta property="og:description" content="Siap menyambut zona harmonia? Saksikan hitung mundur menuju BAZKOM MONSTAZIA 2025!" />
-  <meta property="og:image" content="https://rafyermadi.github.io/countdownbazkom/preview.jpg" />
-  <meta property="og:url" content="https://rafyermadi.github.io/countdownbazkom/" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
   <title>Countdown BAZKOM MONSTAZIA</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -116,11 +109,9 @@
     .tagline {
       font-size: 1.6rem;
       margin-bottom: 35px;
+      color: #ccccff;
       font-style: italic;
-      background: linear-gradient(to right, #ffaadd, #d0cfff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 6px #ffccff;
+      text-shadow: 0 0 5px #ff00ccaa;
     }
     .countdown-container {
       background: rgba(255, 255, 255, 0.05);
@@ -134,10 +125,8 @@
     .countdown-title {
       font-size: 2.8rem;
       margin-bottom: 35px;
-      background: linear-gradient(to right, #ff6ec4, #7873f5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 10px #ff6ec4, 0 0 20px #7873f5;
+      color: #ff00cc;
+      text-shadow: 0 0 10px #ff00cc, 0 0 20px #00ffe0;
     }
     .countdown {
       display: grid;
@@ -251,60 +240,10 @@
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-    
-    .logo-container {
-      position: relative;
-      display: inline-block;
-      z-index: 1;
-    }
-    
-    .logo-container::before {
-      content: '';
-      position: absolute;
-      width: 340px;
-      height: 340px;
-      background: radial-gradient(circle, #ff00cc88 0%, transparent 70%);
-      border-radius: 50%;
-      z-index: 0;
-      top: -10%;
-      left: -10%;
-    }
-    #star-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0; /* Pastikan di belakang elemen lain */
-    }
-    /* === Bintang yang mengikuti irama musik === */
-    .star-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 0;
-  pointer-events: none;
-    }
-    .star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
-  border-radius: 50%;
-  opacity: 0.3;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-    }
   </style>
 </head>
 <body>
-  <canvas id="star-canvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
-  <div class="logo-container">
-    <img src="monstazia-logo.png" alt="Logo Monstazia" class="logo" />
-  </div>
+  <img src="monstazia-logo.png" alt="Logo Monstazia" class="logo" />
   <div class="tagline">Menanti Asa Zona Harmonia</div>
   <div class="countdown-container">
     <div class="countdown-title">BAZKOM MONSTAZIA STARTS IN</div>
@@ -354,155 +293,5 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
   </script>
-
-<!-- Efek glow berdenyut sesuai musik -->
-  <script>
-    const audioElement = document.getElementById('bg-music');
-    const logo = document.querySelector('.logo');
-    const countdownContainer = document.querySelector('.countdown-container');
-
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioContext.createMediaElementSource(audioElement);
-    const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-    
-    function animateGlow() {
-      analyser.getByteFrequencyData(dataArray);
-      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-      const intensity = average / 255;
-
-      const glowSize = 20 + intensity * 80;
-
-      // Efek ke logo
-      logo.style.filter = `drop-shadow(0 0 ${glowSize}px #ff00cc)`;
-
-      // Efek ke box countdown
-      countdownContainer.style.boxShadow = `
-        0 0 ${glowSize}px #ff00cc88,
-        0 0 ${glowSize * 1.2}px #00ffe088
-      `;
-
-      requestAnimationFrame(animateGlow);
-    }
-
-    // Mulai efek saat musik dimainkan
-    audioElement.addEventListener('play', () => {
-      audioContext.resume().then(() => {
-        animateGlow();
-      });
-    });
-  </script>
-  <script>
-    const canvas = document.getElementById('star-canvas');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    let audioCtx, analyser, source, dataArray;
-    let isMusicPlaying = false;
-    
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    
-    for (let i = 0; i < 150; i++) {
-      stars.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        radius: Math.random() * 1.5 + 0.5,
-        speed: Math.random() * 0.5 + 0.2,
-        twinkle: Math.random() * 0.05
-      });
-    }
-    
-    function animateStars() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      stars.forEach((star, i) => {
-        let intensity = 1;
-        
-        if (isMusicPlaying && analyser) {
-          analyser.getByteFrequencyData(dataArray);
-          const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
-          intensity = avg / 256;
-        } else {
-          intensity = 0.3; // smooth pulse
-        }
-
-      star.y += isMusicPlaying ? star.speed * intensity * 2 : star.speed * 0.2;
-      if (star.y > canvas.height) star.y = 0;
-
-      ctx.beginPath();
-      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.2 + Math.random() * 0.3 * intensity})`;
-      ctx.fill();
-    });
-
-    requestAnimationFrame(animateStars);
-  }
-  animateStars();
-
-  // Hook to audio element
-    const bgMusic = document.getElementById('bg-music');
-    function setupAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        source = audioCtx.createMediaElementSource(bgMusic);
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 64;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-      }
-    }
-    
-    bgMusic.addEventListener('play', () => {
-      setupAudio();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      isMusicPlaying = true;
-    });
-    
-    bgMusic.addEventListener('pause', () => {
-    isMusicPlaying = false;
-    });// Tambahkan di sini, setelah event pause
-    function animateStarsWithMusic() {
-      requestAnimationFrame(animateStarsWithMusic);
-      
-      if (!analyser || !isMusicPlaying) return;
-      
-      const stars = document.querySelectorAll('.star');
-      const dataArrayLocal = new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteFrequencyData(dataArrayLocal);
-      
-      const avg = dataArrayLocal.reduce((a, b) => a + b) / dataArrayLocal.length;
-      const scale = 1 + avg / 256;
-      
-      stars.forEach(star => {
-        star.style.transform = `scale(${scale})`;
-        star.style.opacity = Math.min(1, 0.3 + avg / 512);
-      });
-    }
-    
-    // Jalankan loop animasi
-    animateStarsWithMusic();
-    
-    // Tambahkan bintang ke halaman
-    const starContainer = document.createElement('div');
-    starContainer.classList.add('star-container');
-    document.body.appendChild(starContainer);
-    
-    for (let i = 0; i < 100; i++) {
-      const star = document.createElement('div');
-      star.classList.add('star');
-      star.style.left = `${Math.random() * 100}%`;
-      star.style.top = `${Math.random() * 100}%`;
-      starContainer.appendChild(star);
-    }
-  </script>
-
 </body>
 </html>
