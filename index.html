@@ -100,7 +100,7 @@
     }
     body {
       margin: 0; padding: 0;
-      background: linear-gradient(135deg, #1e0036, #3b004f);
+      background: transparent;
       font-family: 'Ramelik', sans-serif;
       color: #fff;
       text-align: center;
@@ -123,7 +123,7 @@
       text-shadow: 0 0 6px #ffccff;
     }
     .countdown-container {
-      background: rgba(255, 255, 255, 0.05);
+      background: transparent;
       padding: 50px 30px;
       border-radius: 20px;
       box-shadow: 0 0 30px #ff00cc88, 0 0 50px #00ffe088;
@@ -286,29 +286,15 @@
       <div class="time-box"><div class="time" id="seconds">00</div><div class="label">SECONDS</div></div>
     </div>
   </div>
-  <div class="chat-toggle">
-    <button onclick="document.getElementById('chatBox').style.display = document.getElementById('chatBox').style.display === 'flex' ? 'none' : 'flex';">Toggle Interaksi</button>
-  </div>
-  <div class="chat-box" id="chatBox">
-    <input type="text" class="name-input" id="nameInput" placeholder="Nama kamu..." />
-    <input type="text" class="chat-input" id="chatInput" placeholder="Ketik pesanmu..." />
-    <button onclick="sendMessage()">Kirim</button>
-    <div class="emoji-buttons">
-      <button onclick="sendEmoji('❤️')">❤️</button>
-      <button onclick="sendEmoji('🔥')">🔥</button>
-      <button onclick="sendEmoji('🎉')">🎉</button>
-      <button onclick="sendEmoji('😂')">😂</button>
-    </div>
-  </div>
+  
+  
 
   <!-- ...semua isi HTML kamu tetap seperti semula... -->
   
-  <audio id="bg-music" src="monstazia-theme.mp3" autoplay loop></audio>
-  <button id="musicToggle" onclick="toggleMusic()">🔊</button>
   
-  <footer>
-    Made with ❤️ by <a href="https://www.instagram.com/rafy.rayyan/" target="_blank">Rafy Rayyan</a>
-  </footer>
+  
+  
+  
   
   <script>
     const targetDate = new Date("2025-07-18T00:00:00").getTime();
